@@ -16,9 +16,9 @@ You can also expand xAPI and change it to your liking easily with it's simplisti
 Installation
 ----
 
-1. Go to releases and download the latest version or get the Roblox module [here](https://create.roblox.com/marketplace/asset/15836677813/)
+1. Go to [releases](https://github.com/3skue/xAPI/releases/) and download the latest version or get the Roblox module [here](https://create.roblox.com/marketplace/asset/15836677813/)
 2. Insert the module in your game, preferrably inside ReplicatedStorage
-3. Go in your script and type at the top:
+3. Write at the top of your script:
    
    ```lua
    require(game.ReplicatedStorage:WaitForChild("xAPI"))()

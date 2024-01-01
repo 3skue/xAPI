@@ -3,7 +3,7 @@ xAPI
 
 xAPI is a fast, flexible and powerful exploit simulator for Roblox written in pure Luau.
 
-It follows the [Unified Naming Convention](https://github.com/unified-naming-convention/NamingStandard/tree/main) and includes the following features:
+It follows the [Unified Naming Convention](https://github.com/unified-naming-convention/NamingStandard/tree/main) and includes...
 
 - Raw metatable access,
 - Function hooking,
@@ -16,16 +16,22 @@ You can also expand xAPI and change it to your liking easily with it's simplisti
 Installation
 ----
 
-Go to Releases and get your preferred version.
-Once you have acquired your desired release, go to the script you want to use it in and type the following:
+1. Go to releases and download the latest version or get the Roblox module [here](https://create.roblox.com/marketplace/asset/15836677813/)
+2. Insert the module in your game, preferrably inside ReplicatedStorage
+3. Go in your script and type at the top:
+   
+   ```lua
+   require(game.ReplicatedStorage:WaitForChild("xAPI"))()
+   ```
+4. The globals will automatically load in, and you're done!
 
-```lua
-require(Path.to.xAPI)()
-```
-
-The globals will automatically be loaded into your environment.
-
-Why xAPI?
+Contributing
 ----
 
-xAPI dynamically loads globals into a table and only exports the globals when you call the loader function for peak performance. On top of that, xAPI includes Type Checking and can import globals into standard libraries.
+- Go [here](https://github.com/3skue/xAPI/pulls) for improvements
+- Go [here](https://github.com/3skue/xAPI/issues) for bugs and questions
+
+License
+----
+
+Distributed under the MIT License. See `LICENSE` for more information.

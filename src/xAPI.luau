@@ -4,11 +4,11 @@
  / Author	- Eskue (@SQLanguage)
  / Credits	->
  	Libraries
- 		stravant										- Signal module
+ 		stravant									- Signal module
  		metatablecat									- LZ4 module
- 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
+ 		Egor Skriptunoff, boatbomber, and howmanysmall					- Hashlib
  		Kein-Hong Man									- Yueliang
- 		JustAPerson										- LBI
+ 		JustAPerson									- LBI
  		
 ]]
 
@@ -29,11 +29,11 @@ xAPI.Env				= {}
 xAPI.Libraries			= {
 	Bytecode			= require(script:WaitForChild("Bytecode")),
 	Crypt				= require(script:WaitForChild("Crypt")),
-	LZ4					= require(script:WaitForChild("LZ4")),
+	LZ4				= require(script:WaitForChild("LZ4")),
 	Signal				= require(script:WaitForChild("Signal"))
 }
 
-xAPI.AddGlobal			= function(names: {string}, value: any, places: {any}?)
+xAPI.AddGlobal				= function(names: {string}, value: any, places: {any}?)
 	local places = places or {xAPI.Env}
 
 	for _, place in places do
@@ -84,16 +84,16 @@ end
 xAPI.Data				= {
 	Instances			= {},
 	Metatables			= {},
-	InstanceReferences	= {},
-	GC					= {},
+	InstanceReferences		= {},
+	GC				= {},
 	Wrapped				= {},
 	Connections			= {},
-	LoadedModules		= {script},
+	LoadedModules			= {script},
 	AssetCache			= {},
-	CallbackValues		= {},
+	CallbackValues			= {},
 	Workspace			= {},
 	GEnv				= {},
-	IsWindowActive		= true,
+	IsWindowActive			= true,
 	FPS_Cap				= 0, -- 0- means uncapped, 1+ gets capped
 	UI					= Services.Players.LocalPlayer.PlayerGui
 }

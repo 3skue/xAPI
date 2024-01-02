@@ -10,7 +10,7 @@ It follows the [Unified Naming Convention](https://github.com/unified-naming-con
 - An integrated filesystem,
 - [Instance wrapping](https://devforum.roblox.com/t/wrapping-with-metatables-or-how-to-alter-the-functionality-of-roblox-objects-without-touching-them/221611) and more!
 
-You can use xAPI to test out your anticheat, Learn more about exploiting or strengthen your game's security.
+You can use xAPI to test out your anticheat, Learn more about exploiting or discover security weaknesses in your games.
 You can also expand xAPI and change it to your liking easily with it's simplistic and super-flexible structure.
 
 Installation

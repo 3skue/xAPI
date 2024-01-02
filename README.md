@@ -21,7 +21,7 @@ Installation
 3. Write at the top of your script:
    
    ```lua
-   require(game.ReplicatedStorage:WaitForChild("xAPI"))()
+   require(game.ReplicatedStorage.xAPI)()
    ```
 4. The globals will automatically load in, and you're done!
 

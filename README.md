@@ -1,3 +1,5 @@
+![xAPI Logo|690x100](https://devforum-uploads.s3.us-east-2.amazonaws.com/uploads/original/5X/1/d/b/d/1dbda3c0c2dc8eaca48de1cf6573698f185b0cc2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATSAZKDNRF74OVZGC%2F20240102%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240102T114930Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=8c0c595b625ae78ca2901b262bc80183c58fa75c081157c6c8a25e1019653ec3)
+
 xAPI
 ====
 

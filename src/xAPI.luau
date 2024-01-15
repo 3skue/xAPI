@@ -3,12 +3,15 @@
  / xAPI III	- A Powerful Exploit Simulator
  / Author	- Eskue (@SQLanguage)
  / Credits	->
- 	Libraries
+ 	Libraries	
  		stravant										- Signal module
- 		metatablecat									- LZ4 module
- 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
- 		Kein-Hong Man									- Yueliang
- 		JustAPerson										- LBI
+ 		metatablecat										- LZ4 module
+ 		
+ 		Egor Skriptunoff, boatbomber, and howmanysmall						- Hashlib
+ 		
+ 		kosuke14										- vLuau
+ 			TheGreatSageEqualToHeaven and Rerumu						- Fiu (Luau bytecode interpreter)
+ 			RealEthanPlayzDev and Rerumu							- LuauInLuau (Luau compiler)
  		
 ]]
 

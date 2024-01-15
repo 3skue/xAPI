@@ -4,11 +4,11 @@
  / Author	- Eskue (@SQLanguage)
  / Credits	->
  	Libraries
- 		stravant									- Signal module
+ 		stravant										- Signal module
  		metatablecat									- LZ4 module
- 		Egor Skriptunoff, boatbomber, and howmanysmall					- Hashlib
+ 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
  		Kein-Hong Man									- Yueliang
- 		JustAPerson									- LBI
+ 		JustAPerson										- LBI
  		
 ]]
 
@@ -25,15 +25,15 @@ local Services			= setmetatable({}, {
 local wrap, customBehaviour
 
 local xAPI				= {}
-xAPI.Env				= {}
+xAPI.Env					= {}
 xAPI.Libraries			= {
-	Bytecode			= require(script:WaitForChild("Bytecode")),
+	Bytecode				= require(script:WaitForChild("Bytecode")),
 	Crypt				= require(script:WaitForChild("Crypt")),
-	LZ4				= require(script:WaitForChild("LZ4")),
+	LZ4					= require(script:WaitForChild("LZ4")),
 	Signal				= require(script:WaitForChild("Signal"))
 }
 
-xAPI.AddGlobal				= function(names: {string}, value: any, places: {any}?)
+xAPI.AddGlobal			= function(names: {string}, value: any, places: {any}?)
 	local places = places or {xAPI.Env}
 
 	for _, place in places do
@@ -84,16 +84,16 @@ end
 xAPI.Data				= {
 	Instances			= {},
 	Metatables			= {},
-	InstanceReferences		= {},
-	GC				= {},
+	InstanceReferences	= {},
+	GC					= {},
 	Wrapped				= {},
 	Connections			= {},
-	LoadedModules			= {script},
+	LoadedModules		= {script},
 	AssetCache			= {},
-	CallbackValues			= {},
+	CallbackValues		= {},
 	Workspace			= {},
-	GEnv				= {},
-	IsWindowActive			= true,
+	GEnv					= {},
+	IsWindowActive		= true,
 	FPS_Cap				= 0, -- 0- means uncapped, 1+ gets capped
 	UI					= Services.Players.LocalPlayer.PlayerGui
 }
@@ -601,16 +601,7 @@ xAPI.AddGlobal({"setfpscap"}, function(self, newFPS: number)
 end)
 
 xAPI.AddGlobal({"identifyexecutor", "getexecutorname"}, function(self): (string, string)
-	local major = 3 * 2^20
-	local minor = 5 * 2^10
-	local patch = 0 * 2^5
-
-	local globalNum = 0
-	for _, _ in xAPI.Env do
-		globalNum += 2
-	end
-
-	return "xAPI", ("0x%x"):format((major + minor + patch) * globalNum)
+	return "xAPI", "v3.6.0"
 end)
 
 xAPI.AddGlobal({"_G", "shared"}, {})

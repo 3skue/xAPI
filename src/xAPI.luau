@@ -5,13 +5,13 @@
  / Credits	->
  	Libraries	
  		stravant										- Signal module
- 		metatablecat										- LZ4 module
+ 		metatablecat									- LZ4 module
  		
- 		Egor Skriptunoff, boatbomber, and howmanysmall						- Hashlib
+ 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
  		
  		kosuke14										- vLuau
- 			TheGreatSageEqualToHeaven and Rerumu						- Fiu (Luau bytecode interpreter)
- 			RealEthanPlayzDev and Rerumu							- LuauInLuau (Luau compiler)
+ 			TheGreatSageEqualToHeaven and Rerumu		- Fiu (Luau bytecode interpreter)
+ 			RealEthanPlayzDev and Rerumu				- LuauInLuau (Luau compiler)
  		
 ]]
 
@@ -28,12 +28,23 @@ local Services			= setmetatable({}, {
 local wrap, customBehaviour
 
 local xAPI				= {}
-xAPI.Env					= {}
+
+xAPI.Env				= {
+	debug				= {},
+	crypt				= {},
+	cache				= {},
+	WebSocket			= {},
+	Instance			= {},
+	coroutine			= {},
+	task				= {}
+}
+
 xAPI.Libraries			= {
-	Bytecode				= require(script:WaitForChild("Bytecode")),
+	Bytecode			= require(script:WaitForChild("Bytecode")),
 	Crypt				= require(script:WaitForChild("Crypt")),
 	LZ4					= require(script:WaitForChild("LZ4")),
-	Signal				= require(script:WaitForChild("Signal"))
+	Signal				= require(script:WaitForChild("Signal")),
+	Saveinstance		= require(script:WaitForChild("SaveInstance"))
 }
 
 xAPI.AddGlobal			= function(names: {string}, value: any, places: {any}?)
@@ -43,10 +54,6 @@ xAPI.AddGlobal			= function(names: {string}, value: any, places: {any}?)
 		for _, name in names do
 			if type(value) == "function" then
 				place[name] = function(...)
-					if not xAPI.Data.UserFunction then
-						xAPI.Data.UserFunction = debug.info(3, "f")
-					end
-
 					return value(name, ...)
 				end
 
@@ -95,16 +102,12 @@ xAPI.Data				= {
 	AssetCache			= {},
 	CallbackValues		= {},
 	Workspace			= {},
-	GEnv					= {},
+	GEnv				= {},
+	Threads				= {},
 	IsWindowActive		= true,
 	FPS_Cap				= 0, -- 0- means uncapped, 1+ gets capped
 	UI					= Services.Players.LocalPlayer.PlayerGui
 }
-
-xAPI.Env.debug			= {}
-xAPI.Env.crypt			= {}
-xAPI.Env.cache			= {}
-xAPI.Env.WebSocket		= {}
 
 local assert			= function(value: boolean | nil, errorMessage: string)
 	if not value then
@@ -309,9 +312,17 @@ xAPI.AddGlobal({"loadstring"}, function(self, source: string, chunkName: string?
 	xAPI.TypeCheck(1, source, {"string"})
 	xAPI.TypeCheck(2, chunkName, {"string"}, true)
 
-	local chunkName = chunkName or ("%X"):format(math.random(1, 2^256))
+	local chunkName = chunkName or xAPI.Env.crypt.random(8)
 
 	return xAPI.Libraries.Bytecode.loadstring(source, chunkName)
+end)
+
+xAPI.AddGlobal({"dumpstring"}, function(self, source: string): string
+	xAPI.TypeCheck(1, source, {"string"})
+
+	local chunkName = xAPI.Env.crypt.random(8)
+
+	return xAPI.Libraries.Bytecode.dumpstring(source, chunkName)
 end)
 
 xAPI.AddGlobal({"hookfunction", "replaceclosure"}, function(self, old: (...any) -> (...any), new: (...any) -> (...any)): (...any) -> (...any)
@@ -425,6 +436,36 @@ xAPI.AddGlobal({"getthreadidentity", "getidentity", "getthreadcontext"}, functio
 	return identity
 end)
 
+xAPI.AddGlobal({"getallthreads"}, function(self): {thread}
+	return xAPI.Data.Threads
+end)
+
+local function insertThread(thread: thread)
+	table.insert(xAPI.Data.Threads, thread)
+end
+
+for _, func in {"create", "wrap"} do
+	xAPI.Env.coroutine[func] = function(f: (...any) -> (...any), ...): thread
+		xAPI.TypeCheck(1, f, {"function"})
+		local t = coroutine[func](f, ...)
+		
+		insertThread(t)
+		
+		return t
+	end
+end
+
+for _, func in {"spawn", "defer", "delay"} do
+	xAPI.Env.task[func] = function(f: (...any) -> (...any), ...): thread
+		xAPI.TypeCheck(1, f, {"function"})
+		local t = task[func](f, ...)
+
+		insertThread(t)
+
+		return t
+	end
+end
+
 -- debug
 xAPI.AddGlobal({"getinfo"}, function(self, func: (...any) -> (...any)): {
 	source: string,
@@ -436,7 +477,7 @@ xAPI.AddGlobal({"getinfo"}, function(self, func: (...any) -> (...any)): {
 	nups: number,
 	numparams: number,
 	is_vararg: boolean
-	}
+}
 
 	local source, line, name, args, isVariadic, f = debug.info(func, "slnaf")
 	local what = (source == "[C]" and "C") or "Lua"
@@ -444,7 +485,7 @@ xAPI.AddGlobal({"getinfo"}, function(self, func: (...any) -> (...any)): {
 	local short_source = ""
 
 	for _, char in utf8.codes(source or "") do
-		short_source ..= string.char(math.clamp(char, 32, 126))
+		short_source ..= string.char(math.clamp(char, 32, 127))
 	end
 
 	return {
@@ -471,6 +512,13 @@ xAPI.AddGlobal({"isvalidlevel"}, function(self, level: number)
 end, {xAPI.Env.debug, xAPI.Env})
 
 -- Instances
+xAPI.AddGlobal({"saveinstance"}, function(self, ...): string
+	xAPI.Libraries.Saveinstance(xAPI, ...)
+	local path = tostring(game.GameId)..".rbxlx"
+	
+	return path
+end)
+
 xAPI.AddGlobal({"getinstances"}, function(self): {Instance}
 	return xAPI.Data.Instances
 end)
@@ -580,7 +628,7 @@ xAPI.AddGlobal({"getconnections"}, function(self, signal: RBXScriptSignal): {
 	Enabled: false,
 	Fire: (...any) -> (...any),
 	Function: (...any) -> (...any)
-	}
+}
 
 	xAPI.TypeCheck(1, signal, {"RBXScriptSignal", "userdata"})
 
@@ -604,7 +652,7 @@ xAPI.AddGlobal({"setfpscap"}, function(self, newFPS: number)
 end)
 
 xAPI.AddGlobal({"identifyexecutor", "getexecutorname"}, function(self): (string, string)
-	return "xAPI", "v3.6.0"
+	return "xAPI", "v3.6.3"
 end)
 
 xAPI.AddGlobal({"_G", "shared"}, {})
@@ -887,8 +935,6 @@ do
 	end, {xAPI.Env.WebSocket})
 end
 
----- Workspace management
-
 -- Loops and connections
 task.spawn(function()
 	local tick = os.clock()
@@ -1091,29 +1137,31 @@ customBehaviour = {
 		GetPlatform = function(self)
 			self = xAPI.Data.Wrapped[self]
 			-- https://devforum.roblox.com/t/best-method-of-detecting-the-players-platform-eg-mobile-xbox-computer/248835/6
-
+			local options = {}
+			
 			if Services.GuiService:IsTenFootInterface() then
-				local options = {Enum.Platform.XBoxOne, Enum.Platform.PS4, Enum.Platform.XBox360, Enum.Platform.PS5, Enum.Platform.PS3}
-				return options[math.random(1, #options)]
+				options = {Enum.Platform.XBoxOne, Enum.Platform.PS4, Enum.Platform.XBox360, Enum.Platform.PS5, Enum.Platform.PS3}
 			elseif self.TouchEnabled and not self.MouseEnabled then
-				local options = {Enum.Platform.Android, Enum.Platform.IOS}
-				return options[math.random(1, #options)]
+				options = {Enum.Platform.Android, Enum.Platform.IOS}
 			else
-				local options = {Enum.Platform.Windows, Enum.Platform.OSX, Enum.Platform.UWP}
-				return options[math.random(1, #options)]
+				options = {Enum.Platform.Windows, Enum.Platform.OSX, Enum.Platform.UWP}
 			end
+			
+			return options[math.random(1, #options)]
 		end,
 	}
 }
 
-xAPI.AddGlobal({"Instance"}, {
-	new = function(className, parent)
-		local newInstance = Instance.new(className, xAPI.Data.Wrapped[parent])
-		table.insert(xAPI.Data.Instances, newInstance)
+xAPI.AddGlobal({"new"}, function(self, className, parent)
+	local newInstance = Instance.new(className, xAPI.Data.Wrapped[parent])
+	table.insert(xAPI.Data.Instances, newInstance)
+	
+	return wrap(newInstance)
+end, {xAPI.Env.Instance})
 
-		return wrap(newInstance)
-	end,
-})
+xAPI.AddGlobal({"decompile"}, function(self, target: userdata | (...any) -> (...any) | string | proto)
+	return "-- Cannot decompile scripts within Roblox"
+end)
 
 do
 	local w_workspace = wrap(workspace)
@@ -1131,6 +1179,7 @@ end)
 ---- Export globals
 
 return function()
+	xAPI.Data.UserFunction = debug.info(3, "f")
 	local Env = getfenv(2)
 
 	if Env.script then

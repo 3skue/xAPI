@@ -5,13 +5,13 @@
  / Credits	->
  	Libraries	
  		stravant										- Signal module
- 		metatablecat										- LZ4 module
+ 		metatablecat									- LZ4 module
  		
- 		Egor Skriptunoff, boatbomber, and howmanysmall						- Hashlib
+ 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
  		
  		kosuke14										- vLuau
- 			TheGreatSageEqualToHeaven and Rerumu						- Fiu (Luau bytecode interpreter)
- 			RealEthanPlayzDev and Rerumu							- LuauInLuau (Luau compiler)
+ 			TheGreatSageEqualToHeaven and Rerumu		- Fiu (Luau bytecode interpreter)
+ 			RealEthanPlayzDev and Rerumu				- LuauInLuau (Luau compiler)
  		
 ]]
 
@@ -43,8 +43,7 @@ xAPI.Libraries			= {
 	Bytecode			= require(script:WaitForChild("Bytecode")),
 	Crypt				= require(script:WaitForChild("Crypt")),
 	LZ4					= require(script:WaitForChild("LZ4")),
-	Signal				= require(script:WaitForChild("Signal")),
-	Saveinstance		= require(script:WaitForChild("SaveInstance"))
+	Signal				= require(script:WaitForChild("Signal"))
 }
 
 xAPI.AddGlobal			= function(names: {string}, value: any, places: {any}?)
@@ -312,17 +311,9 @@ xAPI.AddGlobal({"loadstring"}, function(self, source: string, chunkName: string?
 	xAPI.TypeCheck(1, source, {"string"})
 	xAPI.TypeCheck(2, chunkName, {"string"}, true)
 
-	local chunkName = chunkName or xAPI.Env.crypt.random(8)
+	local chunkName = chunkName or ("%X"):format(math.random(1, 2^256))
 
 	return xAPI.Libraries.Bytecode.loadstring(source, chunkName)
-end)
-
-xAPI.AddGlobal({"dumpstring"}, function(self, source: string): string
-	xAPI.TypeCheck(1, source, {"string"})
-
-	local chunkName = xAPI.Env.crypt.random(8)
-
-	return xAPI.Libraries.Bytecode.dumpstring(source, chunkName)
 end)
 
 xAPI.AddGlobal({"hookfunction", "replaceclosure"}, function(self, old: (...any) -> (...any), new: (...any) -> (...any)): (...any) -> (...any)
@@ -512,13 +503,6 @@ xAPI.AddGlobal({"isvalidlevel"}, function(self, level: number)
 end, {xAPI.Env.debug, xAPI.Env})
 
 -- Instances
-xAPI.AddGlobal({"saveinstance"}, function(self, ...): string
-	xAPI.Libraries.Saveinstance(xAPI, ...)
-	local path = tostring(game.GameId)..".rbxlx"
-	
-	return path
-end)
-
 xAPI.AddGlobal({"getinstances"}, function(self): {Instance}
 	return xAPI.Data.Instances
 end)
@@ -652,7 +636,7 @@ xAPI.AddGlobal({"setfpscap"}, function(self, newFPS: number)
 end)
 
 xAPI.AddGlobal({"identifyexecutor", "getexecutorname"}, function(self): (string, string)
-	return "xAPI", "v3.7.0"
+	return "xAPI", "v3.6.3"
 end)
 
 xAPI.AddGlobal({"_G", "shared"}, {})
@@ -1158,10 +1142,6 @@ xAPI.AddGlobal({"new"}, function(self, className, parent)
 	
 	return wrap(newInstance)
 end, {xAPI.Env.Instance})
-
-xAPI.AddGlobal({"decompile"}, function(self, target: userdata | (...any) -> (...any) | string | proto)
-	return "-- Cannot decompile scripts within Roblox"
-end)
 
 do
 	local w_workspace = wrap(workspace)

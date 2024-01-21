@@ -5,13 +5,13 @@
  / Credits	->
  	Libraries	
  		stravant										- Signal module
- 		metatablecat									- LZ4 module
+ 		metatablecat										- LZ4 module
  		
- 		Egor Skriptunoff, boatbomber, and howmanysmall	- Hashlib
+ 		Egor Skriptunoff, boatbomber, and howmanysmall						- Hashlib
  		
  		kosuke14										- vLuau
- 			TheGreatSageEqualToHeaven and Rerumu		- Fiu (Luau bytecode interpreter)
- 			RealEthanPlayzDev and Rerumu				- LuauInLuau (Luau compiler)
+ 			TheGreatSageEqualToHeaven and Rerumu						- Fiu (Luau bytecode interpreter)
+ 			RealEthanPlayzDev and Rerumu							- LuauInLuau (Luau compiler)
  		
 ]]
 
@@ -652,7 +652,7 @@ xAPI.AddGlobal({"setfpscap"}, function(self, newFPS: number)
 end)
 
 xAPI.AddGlobal({"identifyexecutor", "getexecutorname"}, function(self): (string, string)
-	return "xAPI", "v3.6.3"
+	return "xAPI", "v3.7.0"
 end)
 
 xAPI.AddGlobal({"_G", "shared"}, {})

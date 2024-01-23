@@ -29,6 +29,8 @@ local wrap, customBehaviour
 
 local xAPI				= {}
 
+xAPI.Services			= Services
+
 xAPI.Env				= {
 	debug				= {},
 	crypt				= {},
@@ -106,7 +108,7 @@ xAPI.Data				= {
 	Threads				= {},
 	IsWindowActive		= true,
 	FPS_Cap				= 0, -- 0- means uncapped, 1+ gets capped
-	UI					= Services.Players.LocalPlayer.PlayerGui
+	Player				= Services.Players.LocalPlayer
 }
 
 local assert			= function(value: boolean | nil, errorMessage: string)
@@ -619,7 +621,7 @@ xAPI.AddGlobal({"isscriptable"}, function(self, object: Instance, property: stri
 end)
 
 xAPI.AddGlobal({"gethui"}, function(self): Instance
-	return xAPI.Data.UI
+	return (xAPI.Data.Player and xAPI.Data.Player.PlayerGui)
 end)
 
 xAPI.AddGlobal({"getconnections"}, function(self, signal: RBXScriptSignal): {
@@ -652,7 +654,7 @@ xAPI.AddGlobal({"setfpscap"}, function(self, newFPS: number)
 end)
 
 xAPI.AddGlobal({"identifyexecutor", "getexecutorname"}, function(self): (string, string)
-	return "xAPI", "v3.7.0"
+	return "xAPI", "v3.7.2"
 end)
 
 xAPI.AddGlobal({"_G", "shared"}, {})

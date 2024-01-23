@@ -1,5 +1,3 @@
--- Optimized from Synapse X
--- If saveinstance doesn't properly work, blame Synapse
 -- https://github.com/Acrillis/SynapseX/blob/9b58c725c768aeb5cc00aba73254bc02ca289bc7/Synapse%20Scripts/InitScript.lua#L740
 
 saveinstance = function(xAPI, ...)
@@ -8,6 +6,11 @@ saveinstance = function(xAPI, ...)
 	local savebuffer
 	
 	local b64encode = xAPI.Env.crypt.b64encode
+	local players = xAPI.Services.Players
+	
+	local localPlayer = xAPI.Data.Player
+	
+	local scriptPlaceholder = xAPI.Env.decompile("")
 	
 	local OPTIONS = {
 		mode = 'optimized',
@@ -18,7 +21,7 @@ saveinstance = function(xAPI, ...)
 	}
 
 	do
-		local tab_op = (...)
+		local tab_op = ...
 		if type(tab_op) == 'table' then
 			for idx, opt in tab_op do
 				if OPTIONS[idx] ~= nil then
@@ -28,26 +31,8 @@ saveinstance = function(xAPI, ...)
 		end
 	end
 
-	local pnolist = {
-		Instance = {
-			Archivable = true,
-			ClassName = true,
-			DataCost = true,
-			Parent = true,
-			RobloxLocked = true
-		},
-		BasePart = {
-			Position = true,
-			Rotation = true
-		},
-		BaseScript = {
-			LinkedSource = true
-		}
-	}
-
 	local pesplist = {
 		UnionOperation = {
-			AssetId = 'Content',
 			ChildData = 'BinaryString',
 			FormFactor = 'Token',
 			InitialSize = 'Vector3',
@@ -63,17 +48,21 @@ saveinstance = function(xAPI, ...)
 			MaterialColors = 'BinaryString'
 		}
 	}
+	
 	local ldecompile = function()
 		return "-- Cannot decompile scripts within Roblox"
 	end
+	
 	local slist
+	
 	do
 		local mode = tostring(OPTIONS.mode):lower()
-		local tmp = { }
+		local tmp = {}
+		
 		if mode == 'full' then
 			local _list_0 = game:GetChildren()
-			for _index_0 = 1, #_list_0 do
-				local x = _list_0[_index_0]
+			
+			for _, x in _list_0 do
 				table.insert(tmp, x)
 			end
 		elseif mode == 'optimized' then
@@ -91,15 +80,15 @@ saveinstance = function(xAPI, ...)
 				'Teams',
 				'Workspace'
 			}
-			for _index_0 = 1, #_list_0 do
-				local x = _list_0[_index_0]
+			
+			for _, x in _list_0 do
 				table.insert(tmp, game:FindService(x))
 			end
 		elseif mode == 'scripts' then
 			local hier = game:GetDescendants()
-			local cache = { }
+			local cache = {}
 			for i, s in hier do
-				if s.ClassName == 'LocalScript' or s.ClassName == 'ModuleScript' then
+				if s:IsA("BaseScript") or s:IsA("ModuleScript") then
 					local top = s
 					while top.Parent and top.Parent ~= game do
 						top = top.Parent
@@ -114,13 +103,14 @@ saveinstance = function(xAPI, ...)
 				table.insert(tmp, i)
 			end
 		end
+		
 		slist = tmp
 	end
 	
 	local ilist
 	
 	do
-		local t = { }
+		local t = {}
 
 		for _, v in {
 			'BubbleChat',
@@ -150,15 +140,15 @@ saveinstance = function(xAPI, ...)
 
 	local getData = function()
 		local classes = require(script.ApiDump).Classes
-		local classData = { }
+		local classData = {}
 
 		for i0, v0 in classes do
 			local members = v0.Members
-			local data = { }
+			local data = {}
 
 			data.Name = v0.Name
 			data.Superclass = v0.Superclass
-			data.Properties = { }
+			data.Properties = {}
 			classData[v0.Name] = data
 
 			for i1, v1 in members do
@@ -210,58 +200,39 @@ saveinstance = function(xAPI, ...)
 		end
 	end
 	
-	local properties = setmetatable({ }, {
+	local properties = setmetatable({}, {
 		__index = function(self, name)
-			local proplist = { }
+			local proplist = {}
 			local layer = plist[name]
 			while layer do
 				local _list_0 = layer.Properties
-				for _index_0 = 1, #_list_0 do
-					local p = _list_0[_index_0]
+				
+				for _, p in _list_0 do
 					table.insert(proplist, p)
 				end
+				
 				layer = plist[layer.Superclass]
 			end
+			
 			table.sort(proplist, function(a, b)
 				return a.Name < b.Name
 			end)
+			
 			self[name] = proplist
 			return proplist
 		end
 	})
-	local identifiers = setmetatable({
-		count = 0
-	}, {
+	
+	local identifiers = setmetatable({}, {
 		__index = function(self, obj)
-			self.count = self.count + 1
-			local rbxi = 'RBX' .. self.count
+			local rbxi = 'RBX'..xAPI.Services.HttpService:GenerateGUID(false):gsub("-", "")
 			self[obj] = rbxi
+			
 			return rbxi
 		end
 	})
-	local typesizeround
-	typesizeround = function(s)
-		return math.floor(buffersize / (0x400 ^ s) * 10) / 10
-	end
-	local getsizeformat
-	getsizeformat = function()
-		local res
-		for i, v in ipairs({
-			'b',
-			'kb',
-			'mb',
-			'gb',
-			'tb'
-			}) do
-			if buffersize < 0x400 ^ i then
-				res = typesizeround(i - 1) .. v
-				break
-			end
-		end
-		return res
-	end
-	local getsafeproperty
-	getsafeproperty = function(i, name)
+	
+	local getsafeproperty = function(i, name)
 		return i[name]
 	end
 	
@@ -269,12 +240,11 @@ saveinstance = function(xAPI, ...)
 		return tostring(game.GameId)..".rbxlx"
 	end
 	
-	local savecache
-	savecache = function()
+	local savecache = function()
 		local savestr = table.concat(savebuffer)
 
 		buffersize = buffersize + #savestr
-		savebuffer = { }
+		savebuffer = {}
 
 		xAPI.Env.appendfile(placename, savestr)
 
@@ -296,13 +266,13 @@ saveinstance = function(xAPI, ...)
 				local sprops
 				local clsname = v0.ClassName
 
-				if ilist[v0.Name] or not plist[clsname] then
+				if table.find(ilist, v0.Name) or not plist[clsname] then
 					_continue_0 = true
 					break
 				end
 
 				local props = properties[clsname]
-				savebuffer[#savebuffer + 1] = '<Item class="' .. clsname .. '" referent="' .. identifiers[v0] .. '"><Properties>'
+				savebuffer[#savebuffer + 1] = '<Item class="' .. clsname .. '" referent="' .. identifiers[v0] .. '"><Properties>\n'
 
 				for i1, v1 in props do
 					local _continue_1 = false
@@ -339,6 +309,7 @@ saveinstance = function(xAPI, ...)
 							end
 						end
 						local _exp_0 = v1.ValueType
+						
 						if 'BrickColor' == _exp_0 then
 							tag = 'int'
 							value = raw.Number
@@ -347,7 +318,7 @@ saveinstance = function(xAPI, ...)
 							value = '<R>' .. raw.r .. '</R><G>' .. raw.g .. '</G><B>' .. raw.b .. '</B>'
 						elseif 'ColorSequence' == _exp_0 then
 							tag = 'ColorSequence'
-							local ob = { }
+							local ob = {}
 							local _list_0 = raw.Keypoints
 							for i2, v2 in _list_0 do
 								ob[#ob + 1] = v2.Time .. ' ' .. v2.Value.r .. ' ' .. v2.Value.g .. ' ' .. v2.Value.b .. ' 0'
@@ -363,7 +334,7 @@ saveinstance = function(xAPI, ...)
 							else
 								value = b64encode(raw)
 							end
-						elseif 'CoordinateFrame' == _exp_0 then
+						elseif 'CFrame' == _exp_0 then
 							local X, Y, Z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = raw:components()
 							tag = 'CoordinateFrame'
 							value = '<X>' .. X .. '</X>' .. '<Y>' .. Y .. '</Y>' .. '<Z>' .. Z .. '</Z>' .. '<R00>' .. R00 .. '</R00>' .. '<R01>' .. R01 .. '</R01>' .. '<R02>' .. R02 .. '</R02>' .. '<R10>' .. R10 .. '</R10>' .. '<R11>' .. R11 .. '</R11>' .. '<R12>' .. R12 .. '</R12>' .. '<R20>' .. R20 .. '</R20>' .. '<R21>' .. R21 .. '</R21>' .. '<R22>' .. R22 .. '</R22>'
@@ -372,12 +343,13 @@ saveinstance = function(xAPI, ...)
 							value = raw.Min .. ' ' .. raw.Max
 						elseif 'NumberSequence' == _exp_0 then
 							tag = 'NumberSequence'
-							local ob = { }
+							local ob = {}
 							local _list_0 = raw.Keypoints
-							for _index_2 = 1, #_list_0 do
-								local v = _list_0[_index_2]
+							
+							for _, v in _list_0 do
 								ob[#ob + 1] = v.Time .. ' ' .. v.Value .. ' ' .. v.Envelope
 							end
+							
 							value = table.concat(ob, ' ')
 						elseif 'PhysicalProperties' == _exp_0 then
 							tag = 'PhysicalProperties'
@@ -386,18 +358,6 @@ saveinstance = function(xAPI, ...)
 							else
 								value = '<CustomPhysics>false</CustomPhysics>'
 							end
-						elseif 'ProtectedString' == _exp_0 then
-							tag = 'ProtectedString'
-							if v1.Name == 'Source' then
-								if v0.ClassName == 'Script' then
-									value = '-- Server scripts can NOT be decompiled\n'
-								else
-									value = '-- Cannot decompile scripts'
-								end
-							else
-								value = raw
-							end
-							value = value:gsub(pattern, escapes)
 						elseif 'Rect2D' == _exp_0 then
 							tag = 'Rect2D'
 							value = '<min>' .. '<X>' .. raw.Min.X .. '</X>' .. '<Y>' .. raw.Min.Y .. '</Y>' .. '</min>' .. '<max>' .. '<X>' .. raw.Max.X .. '</X>' .. '<Y>' .. raw.Max.Y .. '</Y>' .. '</max>'
@@ -438,8 +398,9 @@ saveinstance = function(xAPI, ...)
 								value = raw.Value
 							end
 						end
+						
 						if tag then
-							savebuffer[#savebuffer + 1] = '<' .. tag .. ' name="' .. v1.Name .. '">' .. value .. '</' .. tag .. '>'
+							savebuffer[#savebuffer + 1] = '\t<' .. tag .. ' name="' .. v1.Name .. '">' .. value .. '</' .. tag .. '>\n'
 						end
 						_continue_1 = true
 					until true
@@ -447,12 +408,17 @@ saveinstance = function(xAPI, ...)
 						break
 					end
 				end
-				savebuffer[#savebuffer + 1] = '</Properties>'
+				
+				if (v0:IsA("BaseScript") or v0:IsA("ModuleScript")) and OPTIONS.noscripts ~= true then
+					savebuffer[#savebuffer + 1] = ('\t<ProtectedString name="Source"><![CDATA[%s]]></ProtectedString>\n'):format(scriptPlaceholder:gsub(pattern, escapes))
+				end
+				
+				savebuffer[#savebuffer + 1] = '</Properties>\n'
 				local chl = v0:GetChildren()
 				if #chl ~= 0 then
 					savehierarchy(chl, savebuffer)
 				end
-				savebuffer[#savebuffer + 1] = '</Item>'
+				savebuffer[#savebuffer + 1] = '</Item>\n'
 				_continue_0 = true
 			until true
 			if not _continue_0 then
@@ -460,14 +426,16 @@ saveinstance = function(xAPI, ...)
 			end
 		end
 	end
+	
 	local savefolder = function(n, h)
 		local Ref = identifiers[Instance.new('Folder')]
-		table.insert(savebuffer, '<Item class="Folder" referent="' .. Ref .. '"><Properties><string name="Name">' .. n .. '</string></Properties>')
+		table.insert(savebuffer, '<Item class="Folder" referent="' .. Ref .. '">\n<Properties>\n<string name="Name">' .. n .. '</string>\n</Properties>\n')
 		savehierarchy(h)
-		return table.insert(savebuffer, '</Item>')
+		return table.insert(savebuffer, '</Item>\n')
 	end
+	
 	local savegame = function()
-		local plr = game:GetService('Players').LocalPlayer:GetChildren()
+		
 		local _nil = xAPI.Env.getnilinstances()
 		for i, v in next, _nil do
 			if v == game then
@@ -478,29 +446,25 @@ saveinstance = function(xAPI, ...)
 
 		xAPI.Env.writefile(placename, '<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><External>null</External><External>nil</External>')
 		savehierarchy(slist)
-		savefolder('localplayer', plr)
+		savefolder('localplayer', localPlayer:GetChildren())
 		savefolder('nil', _nil)
+		
 		table.insert(savebuffer, '</roblox>')
+		
 		return savecache()
 	end
-	do
-		local plys = game:GetService('Players')
-		local loc = plys.LocalPlayer
-		local _list_0 = plys:GetPlayers()
-		for _index_0 = 1, #_list_0 do
-			local p = _list_0[_index_0]
-			if p ~= loc then
-				ilist[p.Name] = true
-			end
+	
+	for _, p in players:GetPlayers() do
+		if p ~= localPlayer then
+			table.insert(ilist, p.Name)
 		end
 	end
-	do
-		placename = getplacename()
-		buffersize = 0
-		savebuffer = { }
+	
+	placename = getplacename()
+	buffersize = 0
+	savebuffer = {}
 
-		savegame()
-	end
+	savegame()
 end
 
 return saveinstance

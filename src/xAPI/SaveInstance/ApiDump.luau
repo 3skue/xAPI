@@ -24969,6 +24969,23 @@ return {
 						["Name"] = [==[Content]==];
 					};
 				};
+				{
+					["Category"] = [==[Data]==];
+					["MemberType"] = [==[Property]==];
+					["Name"] = [==[Source]==];
+					["Security"] = {
+						["Read"] = [==[None]==];
+						["Write"] = [==[None]==];
+					};
+					["Serialization"] = {
+						["CanLoad"] = true;
+						["CanSave"] = true;
+					};
+					["ValueType"] = {
+						["Category"] = [==[DataType]==];
+						["Name"] = [==[Content]==];
+					};
+				};
 			};
 			["Tags"] = {
 				[==[NotCreatable]==];

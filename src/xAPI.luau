@@ -246,7 +246,7 @@ xAPI.AddGlobal({"hookmetamethod"}, function(self, object: {any} | userdata, meth
 	return oldMethod
 end)
 
-xAPI.AddGlobal({"isreadonly"}, function(self, t: {any}): {any}
+xAPI.AddGlobal({"isreadonly"}, function(self, t: {any}): boolean
 	xAPI.TypeCheck(1, t, {"table"})
 
 	local originalKey = t[1]

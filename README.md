@@ -3,6 +3,17 @@
 xAPI
 ====
 
+> The revamp is going to be released later. By later I mean maybe a few months later.
+>
+> The revamp is going to be more of an actual pentesting/debugging tool inside of Roblox as opposed to being just an interface to port scripts from Synapse X to Studio.
+> Here's an rough timeline if anyone is a little unpatient:
+
+- [ ] Metamethod hooks (Currently in progress)
+- [ ] Function decompiler
+- [ ] Metatable hooks (Maybe)
+
+> "Meta*method* hook" means being able to fire seperate raw metamethods without having to invoke for example the dot (a.b) or table index (a[b]) operator for __index, while "meta*table* hook" means being able to intercept metamethods
+
 xAPI is a fast, flexible and powerful exploit simulator for Roblox written in pure Luau.
 
 It follows the [Unified Naming Convention](https://github.com/unified-naming-convention/NamingStandard/tree/main) and includes...
@@ -37,3 +48,5 @@ License
 ----
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+xAPI is not produced, developed or otherwise maintained by the Roblox Corporation.

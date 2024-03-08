@@ -9,24 +9,10 @@ xAPI
 > Here's an rough timeline if anyone is a little unpatient:
 
 - [X] Metamethod hooks
-- [ ] Function decompiler (W.I.P)
+- [ ] Function decompiler [CANCELLED DUE TO LIMITATIONS + BEING A MESS FOR OVER 3 REVAMPS]
 - [ ] Metatable hooks (Maybe)
 
 > "Meta*method* hook" means being able to fire seperate raw metamethods without having to invoke for example the dot (a.b) or table index (a[b]) operator for __index, while "meta*table* hook" means being able to intercept metamethods
-
-> Current decompilation progress:
-
-- [X] Hello, World
-```lua
-print(decomp.func(function()
-	print("Hello, world!")
-end))
-
-local _1 = print;
-_1("Hello, world!");
-```
-- [ ] Simple Math
-- [ ] Keywords (math operators, while, for, if, etc.)
 
 xAPI is a fast, flexible and powerful exploit simulator for Roblox written in pure Luau.
 
